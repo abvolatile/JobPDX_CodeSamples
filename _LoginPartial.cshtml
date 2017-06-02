@@ -1,0 +1,114 @@
+@using Microsoft.AspNet.Identity;
+@using JobBoardMVC.Models;
+@using Microsoft.Owin.Security;
+@model LoginViewModel
+
+@if (Request.IsAuthenticated)
+{
+  <!-- created by previous team member -->
+}
+
+// Condition for non-authenticated
+
+else
+{
+    <nav class="navbar navbar-JobPDX navbar-fixed-top">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#guestNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <span>@Html.ActionLink("JobPDX", "Index", "Jobs", new { area = "" }, new { @class = "navbar-brand" })</span>
+        </div>
+        <div class="navbar-collapse collapse" id="guestNavbar">
+            <ul class="nav navbar-nav navbar-left">
+                <!--<li>@*Html.ActionLink("About", "About", "Home")*@</li> -->
+                <!--<li>@*Html.ActionLink("Contact", "Contact", "Home")*@</li> -->
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>@Html.ActionLink("Create your Account!", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
+                <li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown"><b>Sign in</b> <span class="caret"></span></a>
+					<ul id="login-dp" class="dropdown-menu">
+						<li>
+							<div class="row">
+								<div class="col-md-12 text-center">
+									<section id="socialLoginForm" class="text-center">
+									@{
+										var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes();
+										using (Html.BeginForm("ExternalLogin", "Account", new { ReturnUrl = ViewBag.ReturnUrl }))
+										{
+											@Html.AntiForgeryToken()
+											<div id="socialLoginList">
+												<p>
+													@foreach (AuthenticationDescription p in loginProviders)
+													{
+														if (p.Caption == "Google")
+														{
+															<button type="submit" class="btn btn-default" id="@p.AuthenticationType" name="provider" value="@p.AuthenticationType" title="Log in using your @p.Caption account"><img src="~/images/btn_google_signin_dark_normal_web.png" /></button>
+														}
+														else
+														{
+															<button type="submit" class="btn btn-primary" id="@p.AuthenticationType" name="provider" value="@p.AuthenticationType" title="Log in using your @p.Caption account">Sign in with @p.AuthenticationType</button>
+														}
+													}
+												</p>
+											</div>
+										}
+									}
+									</section>
+									<hr />
+									Or Sign in with:
+									<section id="loginForm">
+										@using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+										{
+											<!-- Throwing an error after logging out only (suppressing xframeoptions fixes for now...) -->
+											@Html.AntiForgeryToken() 
+											@* took this out because validation already directs user to separate sign-in or register pages:
+												@Html.ValidationSummary(true, "", new { @class = "text-danger" })*@
+											<div class="form-group emailpass">
+												@*@Html.LabelFor(m => m.Email, new { @class = "col-md-2 control-label sr-only" })*@
+												<div class="input-group">
+													<span class="input-group-addon glyphicon glyphicon-user"></span>
+													@Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Email Address" })
+													@Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+												</div>
+											</div>
+											<div class="form-group emailpass">
+												@*@Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label sr-only" })*@
+												<div class="input-group">
+													<span class="input-group-addon glyphicon glyphicon-lock"></span>
+													@Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Password" })
+													@Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+												</div>
+											</div>
+											<div class="form-group">
+												<div class="">
+													<div class="checkbox-inline" style="color: #f0ad4e;">
+														@Html.CheckBoxFor(m => m.RememberMe)
+														@Html.LabelFor(m => m.RememberMe)
+													</div>
+													<input type="submit" value="Sign in" class="btn btn-primary" style="margin-left:10px;font-size:16px;padding:5px 15px;" />
+												</div>
+											</div>
+
+											@* Enable this once you have account confirmation enabled for password reset functionality
+											<p>
+												@Html.ActionLink("Forgot your password?", "ForgotPassword")
+											</p>*@
+
+										}
+									</section>
+									<div class="bottom text-center">
+										@Html.ActionLink("Register as a new user", "Register")
+									</div>
+								</div>
+							</div>
+						</li>
+					</ul>
+				</li>
+            </ul>
+        </div>
+    </nav>
+}

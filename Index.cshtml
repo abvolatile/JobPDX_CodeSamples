@@ -1,0 +1,98 @@
+
+@model JobBoardMVC.Models.JobLocationViewModel
+
+@{
+
+	ViewBag.Title = "Home";
+	Layout = "../Shared/_Layout.cshtml";
+
+@* Global variables - created by another team member *@
+
+<style>
+	.body-content {
+		background-color: rgba(255,255,255,0);
+	}
+
+	.welcome {
+		background-color: rgba(255,255,255,0.9);
+		max-width: 700px;
+		min-height: 350px;
+		margin: 30px auto 100px auto;
+		padding: 5%;
+	}
+
+	h2 {
+		font-family: 'Rambla', sans-serif;
+		font-size: 60px;
+		color: #F0AD4E;
+		text-shadow: 2px 2px 4px #23527e;
+	}
+</style>
+<!-- This is the Landing Page, /Home/Index.cshtml View. -->
+
+
+@if (users.Find(x => x.Id == userId) != null)
+{
+        <div class="container-fluid welcome text-center">
+			<h2>Welcome back, Administrator.</h2>
+        </div>
+}
+
+
+else if (Request.IsAuthenticated)
+{
+
+        <div class="container-fluid welcome text-center">
+            <h2>Welcome back, @userName.</h2>
+			<br />
+			<h3>There are <span style="font-weight:bold;color:#23527e">@jobCount</span> jobs available and <span style="font-weight:bold;color:#23527e">@companyCount</span> companies hiring.</h3>
+
+            <h3>Click here to continue your search: <a href="/Jobs/Index" id="Link">JobPDX</a></h3>
+
+        </div>
+
+}
+
+else
+{
+
+        <div class="container-fluid welcome text-center">
+
+            <h2>Welcome to JobPDX</h2>
+			<br />
+            <h3>There are <span style="font-weight:bold;color:#23527e">@jobCount</span> jobs available and <span style="font-weight:bold;color:#23527e">@companyCount</span> companies hiring.</h3>
+
+                <br />
+			<h3><a href="/Account/Register" id="registerLink">Sign Up</a> and find yours now!</h3>
+
+
+        </div>
+}
+
+	<div id="myCarousel" class="carousel slide" data-ride="carousel" @*style="background-color:rgba(255,255,255,0.6);*@">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<div class="carousel-inner">
+					@{ 
+
+						var i = 0;
+						foreach (var logo in db.CompanyFiles)
+						{
+							var itemClass = i++ == 0 ? "item active" : "item";
+						<!-- item -->
+						<div class="@itemClass">
+							<img src="@Url.Action("Index", "CompanyInfo", new { id = logo.FileId })" alt="@logo.CompanyName logo" class="img-responsive" style="margin:10px auto;height:140px;max-width:700px;">
+						</div>
+						<!-- end item -->
+						}
+					}
+					</div><!-- end carousel inner -->
+
+				</div>
+				<a class="left carousel-control" href="#myCarousel" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>
+				<a class="right carousel-control" href="#myCarousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>
+			</div>
+		</div>
+	</div><!-- end carousel -->
+

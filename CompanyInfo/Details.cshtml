@@ -1,0 +1,167 @@
+@model JobBoardMVC.Models.CompanyViewModel
+
+@{
+    ViewBag.Title = Model.company.CompanyName;
+    Layout = "../Shared/_CompanyLayout.cshtml";
+}
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Rambla:700i" rel="stylesheet">
+<style>
+    .container {
+        font-family: 'Roboto', Helvetica Neue, Helvetica, Arial, sans-serif;
+        font-size: 15px;
+    }
+    .embed-container {
+        position: relative;
+        padding-bottom: 56.25%;
+        margin-bottom: 10px;
+        height: 0;
+        overflow: hidden;
+        max-width: 100%;
+    }
+
+    .embed-container iframe, .embed-container object, .embed-container embed {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+    .body-content {
+        background-color: rgba(255,255,255,0.9);
+    }
+    .companyInfo, .map, .jobs {
+        font-family: 'Rambla', sans-serif;
+        color: #F0AD4E;
+        font-size: 28px;
+        font-weight: 900;
+        text-shadow: 2px 2px 3px #23527e;
+    }
+
+    #map {
+        height: 100%;
+    }
+</style>
+
+<!-- SAVE COMPANY/JOB CREATED BY ANOTHER TEAM MEMBER -->
+
+<div class="container" style="padding-right: 45px;">
+    <div class="row">
+        <div class="col-lg-6">
+			@if (Model.company.Files.Any(f => f.FileType == JobBoardMVC.Models.FileType.Logo))
+			{
+				<img style="margin-top:20px;max-height:120px;max-width:300px;vertical-align:top" src="~/CompanyInfo?id=@Model.company.Files.First(f => f.FileType == JobBoardMVC.Models.FileType.Logo).FileId" alt="Company Logo" />
+			}
+				<address style="display:inline-block;margin:20px 0 0 15px;">
+					@{ 
+						var location = Model.company.State;
+						if (location == "OR") { location = "Oregon"; }
+						else if (location == "WA") { location = "Washington"; }
+					}
+					<strong>@location  Location</strong><br />
+					@Model.company.Address<br />
+					@(Model.company.City), @Model.company.State @Model.company.ZipCode <br />
+				</address>
+            <h3>
+                @*@Model.company.CompanyName*@
+                @{ 
+                    var disable = "";
+                    if (Model.companySaved)
+                    {
+                        disable = "disabled";
+                    }
+                }
+				@if (!User.IsInRole("Admin"))
+				{
+					<a onclick="SaveCompany('@Model.company.CompanyName', this)" class="button btn btn-primary @disable">Save</a>
+				}
+				@if (User.IsInRole("Admin"))
+				{
+					@Html.ActionLink("Edit", "Edit", "CompanyInfo", new { id = Model.company.CompanyName }, new { @class = "btn btn-primary" })
+				}
+            </h3>
+            <div style="margin-bottom:30px;">
+				<h4 class="companyInfo"><strong>@Model.company.CompanyName Info</strong></h4>
+
+				<p style="white-space:pre-line;"><strong>Company Type:</strong> </p>
+
+				<p style="white-space:pre-line;"><strong>Industry Served:</strong> </p>
+
+				<p style="white-space:pre-line;"><strong>Languages Used:</strong> </p>
+
+				<p style="white-space:pre-line;"><strong>Categories:</strong> @Model.company.Categories</p>
+
+				<p style="white-space:pre-line;"><strong>Description:</strong> @Model.company.Description</p>
+
+			</div>
+
+			<h4 class="mapbox jobs"><strong>Location</strong></h4>
+
+
+<!-- GOOGLE MAP WITH COMPANY LOCATION CREATED BY ANOTHER TEAM MEMBER -->
+        
+        
+        <div class="col-lg-6">
+			@if (User.IsInRole("Admin"))
+			{
+				<h3>@Html.ActionLink("Add New Job", "Create", "Jobs", null, new { @class = "btn btn-success" })</h3>
+			}
+			<h3 style="white-space:pre-line;font-weight:900;color:#23527e;">@Model.jobCount <span class="jobs">Jobs Available</span></h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="headerTitle" style="min-width:320px;">@Html.DisplayNameFor(model => model.jobs.FirstOrDefault().JobTitle)</th>
+						@if (!User.IsInRole("Admin"))
+						{
+							<th class="text-center">Save Job</th>
+							<th class="text-center">@Html.DisplayNameFor(model => model.jobs.FirstOrDefault().ApplicationLink)</th>
+						}
+						else if (User.IsInRole("Admin"))
+						{
+							<th class="text-center">Edit</th>
+						}
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.jobs.Any())
+                    {
+                        foreach (var item in Model.jobs)
+                        {
+                            <tr>
+                                <!-- <td> tags must have no whitespace -->
+                                <td class="tableTitle">@Html.DisplayFor(modelItem => item.JobTitle)</td>
+								@if (!User.IsInRole("Admin"))
+								{
+									<td class="text-center"><a onclick="SaveJob('@item.ID', this)" class="button btn btn-primary btn-grey">Save</a></td>
+									<td class="text-center"><input type="button" class="btn btn-warning btn-grey" value="Apply" onclick="window.open('@item.ApplicationLink')"></td>
+								}
+								else if (User.IsInRole("Admin"))
+								{
+									<td class="text-center">
+										<input type="button" class="btn btn-primary btn-sm editJobButton" value="Edit" onclick="location.href='@Url.Action("Edit", "Jobs", new { id = item.ID })'">
+									</td>
+								}
+                            </tr>
+						}
+					}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+	<div style="padding:20px;">
+		@if (User.IsInRole("Admin"))
+		{
+			@Html.ActionLink("Back to List", "Admin", "Home")
+		}
+		else
+		{
+			@Html.ActionLink("Back to List", "Index", "Jobs")
+		}
+	</div>
+</div>
+           
+           
+<!-- SCRIPTS CREATED BY ANOTHER TEAM MEMBER -->
+
